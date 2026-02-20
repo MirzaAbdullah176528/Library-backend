@@ -82,3 +82,5 @@ jest.config.local.js
 # =========================
 *.sqlite
 *.db
+
+ProfileUploads
