@@ -83,3 +83,4 @@ jest.config.local.js
 *.sqlite
 *.db
 
+uploads
