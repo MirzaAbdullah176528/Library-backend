@@ -20,6 +20,10 @@ const bookSchema = mongoos.Schema({
         type: String,
         required: false
     },
+    author: {
+        type: String,
+        required: true
+    },
     Created_By: {
         username: {
             type: String,

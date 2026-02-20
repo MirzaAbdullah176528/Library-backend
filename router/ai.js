@@ -18,7 +18,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 router.post('/', async (req, res) => {
   try {
-    const { topic, name , category} = req.body;
+    const { topic, name , category , author} = req.body;
 
     if (!topic) {
       return res.status(400).json({ error: 'Topic is required' });
@@ -31,6 +31,7 @@ router.post('/', async (req, res) => {
       User Request: ${topic}.
       Book Name: ${name || 'choose on your own'}
       Category: ${category || 'choose on your own'}
+      author: ${author || 'choose on your own'}
 
       RULE MUST FOLLOW:
         LOGIC & RULES:
@@ -46,6 +47,7 @@ router.post('/', async (req, res) => {
       {
         "name": "Book Name",
         "category": "Category Name",
+        "author": "author"
         "description": "..."
       }`  
 

@@ -16,7 +16,7 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ error: "Username or password missing" })
         }
 
-        const user = await Login.findOne({ Username: Username })
+        const user = await Login.findOne({ Username: Username, isDeleted: { $ne: true } })
 
         if (!user) {
             return res.status(401).json({ error: "Invalid credentials" })
@@ -40,12 +40,10 @@ router.post('/login', async (req, res) => {
             message: "Login successful",
             id: user._id,
             token,
-            avatar: user.avatar 
+            avatar: user.avatar
         })
     } catch (error) {
-        res.status(500).json({
-            error: error.message
-        })
+        res.status(500).json({ error: error.message })
     }
 })
 
@@ -54,15 +52,16 @@ router.post('/signup', ProfileUpload.single('image'), async (req, res) => {
         const { Username, password } = req.body
 
         if (!Username || !password) {
-            return res.status(400).json({ error: 'password or Username is missing' })
+            return res.status(400).json({ error: 'Username or password is missing' })
+        }
+
+        if (typeof Username !== 'string' || typeof password !== 'string') {
+            return res.status(400).json({ error: 'Invalid Username or password format' })
         }
 
         const hashed_pass = await bcrypt.hash(password, 10)
 
-        const userData = {
-            Username,
-            password: hashed_pass
-        }
+        const userData = { Username, password: hashed_pass }
 
         if (req.file) {
             userData.avatar = `/ProfileUploads/${req.file.filename}`
@@ -77,6 +76,10 @@ router.post('/signup', ProfileUpload.single('image'), async (req, res) => {
             avatar: user.avatar
         })
     } catch (error) {
+        
+        if (error.code === 11000) {
+            return res.status(409).json({ error: 'Username already taken' })
+        }
         res.status(400).json({ error: error.message })
     }
 })
@@ -92,9 +95,7 @@ router.patch('/update/:id', ProfileUpload.single('image'), async (req, res) => {
 
         const updateData = {}
 
-        if (newUsername) {
-            updateData.Username = newUsername
-        }
+        if (newUsername) updateData.Username = newUsername
 
         if (newPassword) {
             const hashedPassword = await bcrypt.hash(newPassword, 10)
@@ -105,50 +106,61 @@ router.patch('/update/:id', ProfileUpload.single('image'), async (req, res) => {
             updateData.avatar = `/ProfileUploads/${req.file.filename}`
         }
 
-        const updatedUser = await Login.findByIdAndUpdate(
-            id,
+        const updatedUser = await Login.findOneAndUpdate(
+            { _id: id, isDeleted: { $ne: true } },
             updateData,
-            {
-                new: true,
-                runValidators: true
-            }
+            { new: true, runValidators: true }
         )
 
         if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' })
+            return res.status(404).json({ message: 'User not found or deleted' })
         }
 
         const userResponse = updatedUser.toObject()
         delete userResponse.password
 
-        return res.status(200).json({
-            message: 'User updated successfully',
-            user: userResponse
-        })
+        return res.status(200).json({ message: 'User updated successfully', user: userResponse })
 
     } catch (error) {
         console.error('Update error:', error)
-        return res.status(500).json({
-            message: 'Server error',
-            error: error.message
-        })
+        return res.status(500).json({ message: 'Server error', error: error.message })
     }
 })
 
 router.get('/profile/:id', async (req, res) => {
     try {
         const id = req.params.id
-        const user = await Login.findById(id).select('-password')
+        const user = await Login.findOne({ _id: id, isDeleted: { $ne: true } }).select('-password')
 
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
 
         return res.status(200).json(user)
-    }
-    catch (err) {
+    } catch (err) {
         console.log(err)
         res.status(500).json({ message: "Server Error", error: err })
+    }
+})
+
+router.delete('/delete/:id', async (req, res) => {
+    try {
+        const id = req.params.id
+
+        const user = await Login.findByIdAndUpdate(
+            id,
+            { isDeleted: true },
+            { new: true }
+        )
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        res.status(200).json({ message: "User soft deleted successfully" })
+
+    } catch (error) {
+        res.status(500).json({ error: error.message })
     }
 })
 

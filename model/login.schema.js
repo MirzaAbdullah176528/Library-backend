@@ -11,10 +11,13 @@ const loginSchema = mongoose.Schema({
         required: true,
         unique: false
     },
-    
     avatar: {
         type: String,
         required: false
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 })
 

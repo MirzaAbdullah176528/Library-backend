@@ -35,8 +35,9 @@ router.post('/', upload.single('image'), async (req, res) => {
             library: req.body.library,
             Created_By: {
                 id: user._id,
-                username: user.username || user.name || user.email || 'System User'
-            }
+                username: user.username || user.name || user.email || 'User'
+            },
+            author : req.body.author
         }
 
         if (req.file) {
