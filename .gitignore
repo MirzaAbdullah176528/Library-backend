@@ -84,3 +84,5 @@ jest.config.local.js
 *.db
 
 ProfileUploads
+
+uploads
