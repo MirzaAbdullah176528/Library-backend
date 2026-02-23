@@ -15,7 +15,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 app.use('/ProfileUploads', express.static(path.join(__dirname, 'ProfileUploads')));
 
 app.use(cors({ 
-    origin: ['http://192.168.110.3:3000', 'http://localhost:3000'] 
+    origin: ['http://192.168.0.108:3000', 'http://localhost:3000' , 'http://192.168.110.3:3000'] 
 }))
 
 app.use(express.json())

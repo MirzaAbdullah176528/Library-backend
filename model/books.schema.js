@@ -24,6 +24,10 @@ const bookSchema = mongoos.Schema({
         type: String,
         required: true
     },
+    pdf: {
+        type: String,
+        require: true
+    },
     Created_By: {
         username: {
             type: String,
@@ -34,7 +38,6 @@ const bookSchema = mongoos.Schema({
             required: true
         }
     }
-
 })
 const Book = mongoos.model('Book', bookSchema)
 
