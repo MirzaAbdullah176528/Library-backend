@@ -9,6 +9,7 @@ router.get('/', async (req, res) => {
         const filters = {}
         if(req.query.name) filters.name = new RegExp(req.query.name, 'i')
         if(req.query.category) filters.category = new RegExp(req.query.category, 'i')
+        if(req.query.author) filters.author = new RegExp(req.query.author, 'i')
         
         if(req.query.created_by) filters['Created_By.id'] = req.query.created_by
 

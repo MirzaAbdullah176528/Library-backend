@@ -66,4 +66,32 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+router.post('/summaries' , async (req , res) => {
+  const { name , category , author } = req.body
+
+  if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
+    }
+
+  const model = genAI.getGenerativeModel({ model: 'gemma-3-27b-it' });
+
+  const prompt = `
+    You are an expert librarian and literary critic. Provide a concise, engaging summary of the following book:
+    Title: ${name || ''}
+    
+    ${author ? `Author: ${author}` : ""}
+    ${category ? `Category: ${category}` : ""}
+
+    Write a 3 to 4 sentence summary that captures the main plot, core themes, and the overall tone of the book or noval or research paper. Do not include spoilers for the ending.
+  `
+
+  const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    res.json({ success: true, data: text });
+
+})
+
 module.exports = router
