@@ -26,7 +26,8 @@ const bookSchema = mongoos.Schema({
     },
     pdf: {
         type: String,
-        require: true
+        require: true,
+        match: /\.pdf$/i
     },
     Created_By: {
         username: {

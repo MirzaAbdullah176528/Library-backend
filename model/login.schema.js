@@ -4,12 +4,15 @@ const loginSchema = mongoose.Schema({
     Username: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        minLength: 6,
+        maxLength: 30,
+        match:[/^\S+$/ , 'No sapces allowed']
     },
     password: {
         type: String,
         required: true,
-        unique: false
+        unique: false,
     },
     avatar: {
         type: String,
